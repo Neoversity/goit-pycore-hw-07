@@ -86,3 +86,17 @@ class Record:
         birthday_str = str(self.birthday) if self.birthday else "None"
         return f"Contact name: {self.name.value}, phones: {'; '.join(str(p) for p in self.phones)}, birthday: {birthday_str}"
 
+
+
+
+def parse_input(user_input):
+    parts = user_input.split()
+    command = parts[0]
+    args = parts[1:] if len(parts) > 1 else []  # Додано перевірку на довжину parts
+    return command, args
+
+def hello():
+    return "Hello! How can I assist you today?"
+
+def close():
+    return "Goodbye!"

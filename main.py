@@ -1,62 +1,89 @@
-from record import Record, Name, Birthday
-from address_book import AddressBook
+from record import Record, Name, Birthday, parse_input, hello, close
+from address_book import AddressBook, add_birthday, show_birthday, birthdays, change_phone, show_phone, show_all
 
 
 
+def main():
+    book = AddressBook()
+    while True:
+        print("add", "change", "phone", "all", "add-birthday", "show-birthday", "birthdays", "hello","close", "exit")
+        user_input = input("Enter a command: ")
+        command, args = parse_input(user_input)
+
+        if command == "add":
+            if len(args) != 2:
+                print("Usage: add [name] [phone]")
+            else:
+                name, phone = args
+                record = book.find(name)
+                if record:
+                    record.add_phone(phone)
+                    print(f"Phone number added to existing contact '{name}'.")
+                else:
+                    new_record = Record(name)
+                    new_record.add_phone(phone)
+                    book.add_record(new_record)
+                    print(f"New contact '{name}' added with phone number '{phone}'.")
+
+        elif command == "change":
+            if len(args) != 3:
+                print("Usage: change [name] [old_phone] [new_phone]")
+            else:
+                name, old_phone, new_phone = args
+                record = book.find(name)
+                if record:
+                    record.edit_phone(old_phone, new_phone)
+                else:
+                    print(f"Contact '{name}' not found.")
+
+        elif command == "phone":
+            if len(args) != 1:
+                print("Usage: phone [name]")
+            else:
+                name = args[0]
+                record = book.find(name)
+                if record:
+                    print(f"{name}'s phone numbers: {', '.join(str(p) for p in record.phones)}")
+                else:
+                    print(f"Contact '{name}' not found.")
+
+        elif command == "all":
+            print(show_all(book))
+            
+        elif command == "add-birthday":
+            if len(args) != 2:
+                print("Usage: add-birthday [name] [DD.MM.YYYY]")
+            else:
+                name, birthday = args
+                print(add_birthday([name, birthday], book))
+
+        elif command == "show-birthday":
+            if len(args) != 1:
+                print("Usage: show-birthday [name]")
+            else:
+                name = args[0]
+                print(show_birthday([name], book))
+
+        elif command == "birthdays":
+            upcoming_birthdays = book.get_upcoming_birthdays()
+            if upcoming_birthdays:
+                print("\n".join(str(record) for record in upcoming_birthdays))
+            else:
+                print("No upcoming birthdays in the next week.")
 
 
-book = AddressBook()
-
-# Створення запису для My
-my_record = Record("My")
-my_record.add_phone("1234567890")
-my_record.add_phone("5555555555")
-my_record.birthday = Birthday("06.05.2005")
-book.add_record(my_record)
-
-# Створення запису для John
-john_record = Record("John")
-john_record.add_phone("1234567890")
-john_record.add_phone("5555555555")
-john_record.birthday = Birthday("11.05.2024")
-book.add_record(john_record)
-
-# Створення та додавання нового запису для Jane
-jane_record = Record("Jane")
-jane_record.add_phone("9876543210")
-book.add_record(jane_record)
-
-# Виведення всіх записів у книзі
-for name, record in book.data.items():
-    print(record)
-
-# Знаходження та редагування телефону для John
-john = book.find("John")
-john.edit_phone("1234567890", "1112223333")
-
-print(john)  # Виведення: Contact name: John, phones: 1112223333, 5555555555, birthday: 15.05.1985
-
-# Пошук конкретного телефону у записі John
-found_phone = john.find_phone("5555555555")
-print(f"{john.name}: {found_phone}")  # Виведення: 5555555555
-
-# Видалення запису Jane
-book.delete("Jane")
-
-# Виведення всіх записів у книзі
-for name, record in book.data.items():
-    print(record)
-
-    # # Знаходження та редагування телефону для John
-john = book.find("John")
-john.edit_phone("123456789", "1112223333")
-
-# Виведення всіх записів у книзі
-for name, record in book.data.items():
-    print(record)
+        elif command == "hello":
+            print(hello())
 
 
-    # Виведення списку користувачів, яких потрібно привітати на наступному тижні з днем народження
-print("Upcoming birthdays:")
-for record in book.get_upcoming_birthdays():
-    print(record)
+        elif command in ["close", "exit"]:
+            print(close())
+            break
+        else:
+            print("Invalid command. Please try again.")
+            
+
+
+if __name__ == "__main__":
+    main()
+
